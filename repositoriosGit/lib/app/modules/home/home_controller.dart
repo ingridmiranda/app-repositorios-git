@@ -12,6 +12,8 @@ abstract class _HomeControllerBase with Store {
   @observable
   int value = 0;
 
+  ObservableList<RepoInfo> repoInfoList = ObservableList<RepoInfo>();
+
   @action
   void increment() {
     value++;
@@ -29,7 +31,7 @@ abstract class _HomeControllerBase with Store {
       repoList = (response.data as List)
         .map((e) => new RepoInfo.fromMap(e as Map<String, dynamic>))
         .toList();
-      print(repoList);
+      repoInfoList.addAll(repoList);
       }
     } catch (e) {
       print(e);
