@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'home_controller.dart';
 
 class HomePage extends StatefulWidget {
@@ -42,9 +43,18 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
               leading: Image.network(controller.repoInfoList[index].owner.avatar_url),
               title: Text(controller.repoInfoList[index].name),
               subtitle: Text(controller.repoInfoList[index].owner.login),
+              onTap: () => _launchURL(controller.repoInfoList[index].html_url),
             );
           });
       }),
     );
+  }
+}
+
+void _launchURL(String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
   }
 }
