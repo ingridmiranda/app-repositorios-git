@@ -10,9 +10,14 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+
 class _HomePageState extends ModularState<HomePage, HomeController> {
   //use 'controller' variable to access controller
 
+  void initState(){
+    controller.getRepositorios();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

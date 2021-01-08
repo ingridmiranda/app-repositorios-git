@@ -34,6 +34,14 @@ mixin _$HomeController on _HomeControllerBase, Store {
     });
   }
 
+  final _$getRepositoriosAsyncAction =
+      AsyncAction('_HomeControllerBase.getRepositorios');
+
+  @override
+  Future<dynamic> getRepositorios() {
+    return _$getRepositoriosAsyncAction.run(() => super.getRepositorios());
+  }
+
   final _$_HomeControllerBaseActionController =
       ActionController(name: '_HomeControllerBase');
 
