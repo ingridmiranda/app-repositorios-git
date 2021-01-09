@@ -14,6 +14,14 @@ abstract class _HomeControllerBase with Store {
 
   ObservableList<RepoInfo> repoInfoList = ObservableList<RepoInfo>();
 
+  @observable 
+  bool isTimeout = false;
+
+  @action
+  void setTimeout(bool timeout){
+    isTimeout = timeout;
+  }
+
   @action
   void increment() {
     value++;

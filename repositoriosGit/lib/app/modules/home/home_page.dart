@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
 import 'package:auto_animated/auto_animated.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -20,25 +22,26 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends ModularState<HomePage, HomeController> {
   //use 'controller' variable to access controller
-bool isConnected;
+  bool isConnected;
+  bool isTimeout;
 
-void _testConnection() async{
+  void _testConnection() async {
     try {
-    final result = await InternetAddress.lookup('example.com');
-    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-      print('connected');
-      isConnected = true;
-    }} on SocketException catch (_) {
+      final result = await InternetAddress.lookup('example.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        print('connected');
+        isConnected = true;
+        controller.getRepositorios();
+      }
+    } on SocketException catch (_) {
       print('not connected');
       isConnected = false;
-  }}
+    }
+  }
 
   void initState() {
     _testConnection();
-    if (isConnected == true){
-      controller.getRepositorios();
-    }
-    print(controller.repoInfoList); //.owner.avatar_url);
+    print(controller.repoInfoList);
     super.initState();
   }
 
@@ -46,13 +49,15 @@ void _testConnection() async{
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF3D5A80),
-      body: Column(
-        children: <Widget>[
-          _titleText(),
-          _bodyPage(),
-          _bottomPage()
-        ],
-      ),
+      body: Observer(builder: (_) {
+        return Column(
+          children: <Widget>[
+            controller.repoInfoList.length == 0 ? SizedBox() : _titleText(),
+            _bodyPage(),
+            _bottomPage()
+          ],
+        );
+      }),
     );
   }
 
@@ -131,6 +136,7 @@ void _testConnection() async{
           ),
         ),
       );
+
   Widget _showInfo() {
     return Expanded(
       child: Observer(builder: (_) {
@@ -150,27 +156,74 @@ void _testConnection() async{
     );
   }
 
+  Duration timeout = const Duration(seconds: 3);
+  Duration ms = const Duration(milliseconds: 1);
+
+  startTimeout([int milliseconds]) {
+    var duration = milliseconds == null ? timeout : ms * milliseconds;
+    return new Timer(duration, handleTimeout);
+  }
+
+  void handleTimeout() {
+    // callback function
+    if (isConnected == false) {
+      print("timeout");
+      controller.setTimeout(true);
+    } else {
+      controller.setTimeout(false);
+    }
+  }
+
   Widget _loadingPage() {
-    return Center(
-      heightFactor: 2.5,
-      child: Container(
-        child: Column(
-        children: [
-          LoadingBouncingGrid.square(
-            backgroundColor: Color(0xFFEE6C4D),
-            size: 100,
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 20),
-            child: Text(
-              "Carregando ...".toUpperCase(),
-              style: TextStyle(
-                  color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
-            ),
-          )
-        ],
-      )),
-    );
+    startTimeout(3000);
+    handleTimeout();
+    return Observer(builder: (_) {
+      return Container(
+          padding:
+              EdgeInsets.only(top: MediaQuery.of(context).size.height / 3.5),
+          alignment: Alignment.center,
+          child: controller.isTimeout == false
+              ? Container(
+                  child: Column(
+                  children: [
+                    LoadingBouncingGrid.square(
+                      backgroundColor: Color(0xFFEE6C4D),
+                      size: 100,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: Text(
+                        "Carregando ...".toUpperCase(),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    // )
+                  ],
+                ))
+              : AlertDialog(
+                  title: Text("Ops! Sem conexão com a internet...",
+                      style: TextStyle(color: Color(0xFF3D5A80))),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)),
+                  contentPadding: EdgeInsets.all(20),
+                  buttonPadding: EdgeInsets.only(bottom: 10, right: 10),
+                  backgroundColor: Color(0xFFD2E4EE),
+                  content: Container(
+                      height: 35,
+                      child: Image.asset(
+                          'assets/images/toppng.com-no-internet-connection-icon-no-internet-connection-icon.png')),
+                  actions: [
+                    FlatButton(
+                        child: Text("Tentar novamente",
+                            style: TextStyle(color: Color(0xFFEE6C4D))),
+                        onPressed: () =>
+                            Modular.to.pushReplacementNamed("/home")),
+                  ],
+                ));
+    });
   }
 
   Widget _bodyPage() {
@@ -186,6 +239,4 @@ void _launchURL(String url) async {
   } else {
     throw 'Could not launch $url';
   }
-
-  
 }

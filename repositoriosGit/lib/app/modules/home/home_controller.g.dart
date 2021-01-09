@@ -34,6 +34,21 @@ mixin _$HomeController on _HomeControllerBase, Store {
     });
   }
 
+  final _$isTimeoutAtom = Atom(name: '_HomeControllerBase.isTimeout');
+
+  @override
+  bool get isTimeout {
+    _$isTimeoutAtom.reportRead();
+    return super.isTimeout;
+  }
+
+  @override
+  set isTimeout(bool value) {
+    _$isTimeoutAtom.reportWrite(value, super.isTimeout, () {
+      super.isTimeout = value;
+    });
+  }
+
   final _$getRepositoriosAsyncAction =
       AsyncAction('_HomeControllerBase.getRepositorios');
 
@@ -44,6 +59,17 @@ mixin _$HomeController on _HomeControllerBase, Store {
 
   final _$_HomeControllerBaseActionController =
       ActionController(name: '_HomeControllerBase');
+
+  @override
+  void setTimeout(bool timeout) {
+    final _$actionInfo = _$_HomeControllerBaseActionController.startAction(
+        name: '_HomeControllerBase.setTimeout');
+    try {
+      return super.setTimeout(timeout);
+    } finally {
+      _$_HomeControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void increment() {
@@ -59,7 +85,8 @@ mixin _$HomeController on _HomeControllerBase, Store {
   @override
   String toString() {
     return '''
-value: ${value}
+value: ${value},
+isTimeout: ${isTimeout}
     ''';
   }
 }
