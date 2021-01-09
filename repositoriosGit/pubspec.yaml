@@ -33,6 +33,7 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  fancy_on_boarding: ^1.7.0
   loading_animations: ^2.1.0
   auto_animated: ^2.1.0
   auto_size_text: ^2.1.0
