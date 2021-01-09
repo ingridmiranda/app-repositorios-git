@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:auto_animated/auto_animated.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -45,8 +46,11 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
     super.initState();
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
+    _testConnection();
     return Scaffold(
       backgroundColor: Color(0xFF3D5A80),
       body: Observer(builder: (_) {
@@ -127,12 +131,12 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
                         fontWeight: FontWeight.w700, color: Color(0xFFEE6C4D))),
                 onTap: () =>
                     _launchURL(controller.repoInfoList[index].html_url),
-                leading: CircleAvatar(
-                  radius: 30,
-                  backgroundImage: NetworkImage(
-                    controller.repoInfoList[index].owner.avatar_url,
-                  ),
-                )),
+                leading: ClipOval(
+                    child: CachedNetworkImage(
+                    imageUrl: controller.repoInfoList[index].owner.avatar_url,
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    placeholder: (context, url) => CircularProgressIndicator(),
+                    )))
           ),
         ),
       );
