@@ -41,7 +41,6 @@ abstract class _HomeControllerBase with Store {
         .toList();
       repoInfoList.addAll(repoList);
       }
-      print("length: " + repoInfoList.length.toString());
     } catch (e) {
       print(e);
     }

@@ -16,11 +16,10 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends ModularState<SplashPage, SplashController> {
   //use 'controller' variable to access controller
-  Timer _timer;
   ReactionDisposer disposer;
 
   _SplashPageState(){
-    _timer = new Timer(const Duration(milliseconds: 100), () async{
+    new Timer(const Duration(milliseconds: 100), () async{
       await loadConfig();
     });
   }
@@ -28,10 +27,7 @@ class _SplashPageState extends ModularState<SplashPage, SplashController> {
   loadConfig() async{
   await Hive.initFlutter();
   var box = await Hive.openBox('isInitialized');
-  var num = box.get('number');
   if (box.get('number') != null){
-    num = box.get('number') + 1;
-    box.put('number', num);
     Modular.to.pushReplacementNamed("/home");
   } else {
     box.put('number', 0);
