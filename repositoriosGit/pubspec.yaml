@@ -33,6 +33,7 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  flutter_launcher_icons: ^0.8.1
   fancy_on_boarding: ^1.7.0
   loading_animations: ^2.1.0
   auto_animated: ^2.1.0
@@ -58,6 +59,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

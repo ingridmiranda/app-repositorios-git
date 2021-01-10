@@ -58,7 +58,7 @@ final pageList = [
             color: Colors.white,
             fontSize: 34.0,
           )),
-      body: Text('Veja o repositório do seu interesse \n com apenas um clique',
+      body: Text('Abra e veja o repositório do seu \n interesse com apenas um clique',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.white,

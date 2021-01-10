@@ -25,6 +25,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
   //use 'controller' variable to access controller
   bool isConnected;
   bool isTimeout;
+  int times = 0;
 
   void _testConnection() async {
     try {
@@ -32,8 +33,12 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         print('connected');
         isConnected = true;
-        controller.getRepositorios();
-      }
+        if (times == 0){
+          print("times");
+          controller.getRepositorios();
+          times = 1;
+        }
+      } 
     } on SocketException catch (_) {
       print('not connected');
       isConnected = false;
@@ -50,13 +55,12 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    _testConnection();
     return Scaffold(
       backgroundColor: Color(0xFF3D5A80),
       body: Observer(builder: (_) {
         return Column(
           children: <Widget>[
-            controller.repoInfoList.length == 0 ? SizedBox() : _titleText(),
+            (controller.repoInfoList.length == 0 || isConnected == false) ? SizedBox() : _titleText(),
             _bodyPage(),
             _bottomPage()
           ],
@@ -105,8 +109,9 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
     BuildContext context,
     int index,
     Animation<double> animation,
-  ) =>
-      FadeTransition(
+  ) {
+    _testConnection();
+     return FadeTransition(
         opacity: Tween<double>(
           begin: 0,
           end: 1,
@@ -132,18 +137,19 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
                 onTap: () =>
                     _launchURL(controller.repoInfoList[index].html_url),
                 leading: ClipOval(
-                    child: CachedNetworkImage(
+                    child: isConnected == true ? CachedNetworkImage(
                     imageUrl: controller.repoInfoList[index].owner.avatar_url,
                     errorWidget: (context, url, error) => Icon(Icons.error),
                     placeholder: (context, url) => CircularProgressIndicator(),
-                    )))
+                    ) : Image.asset('assets/images/person.png')))
           ),
         ),
-      );
+      );}
 
   Widget _showInfo() {
-    return Expanded(
+    return  isConnected == true ? Expanded(
       child: Observer(builder: (_) {
+        _testConnection();
         return LiveList.options(
             options: options,
             separatorBuilder: (BuildContext context, int index) => Divider(),
@@ -151,7 +157,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
             itemCount: controller.repoInfoList.length,
             itemBuilder: buildAnimatedItem);
       }),
-    );
+    ) : _showDialog();
   }
 
   Widget _bottomPage() {
@@ -176,6 +182,29 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
     } else {
       controller.setTimeout(false);
     }
+  }
+
+  Widget _showDialog(){
+   return AlertDialog(
+                  title: Text("Ops! Sem conexão com a internet...",
+                      style: TextStyle(color: Color(0xFF3D5A80))),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)),
+                  contentPadding: EdgeInsets.all(20),
+                  buttonPadding: EdgeInsets.only(bottom: 10, right: 10),
+                  backgroundColor: Color(0xFFD2E4EE),
+                  content: Container(
+                      height: 35,
+                      child: Image.asset(
+                          'assets/images/toppng.com-no-internet-connection-icon-no-internet-connection-icon.png')),
+                  actions: [
+                    FlatButton(
+                        child: Text("Tentar novamente",
+                            style: TextStyle(color: Color(0xFFEE6C4D))),
+                        onPressed: () =>
+                            Modular.to.pushReplacementNamed("/home")),
+                  ],
+                );
   }
 
   Widget _loadingPage() {
@@ -207,32 +236,13 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
                     // )
                   ],
                 ))
-              : AlertDialog(
-                  title: Text("Ops! Sem conexão com a internet...",
-                      style: TextStyle(color: Color(0xFF3D5A80))),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
-                  contentPadding: EdgeInsets.all(20),
-                  buttonPadding: EdgeInsets.only(bottom: 10, right: 10),
-                  backgroundColor: Color(0xFFD2E4EE),
-                  content: Container(
-                      height: 35,
-                      child: Image.asset(
-                          'assets/images/toppng.com-no-internet-connection-icon-no-internet-connection-icon.png')),
-                  actions: [
-                    FlatButton(
-                        child: Text("Tentar novamente",
-                            style: TextStyle(color: Color(0xFFEE6C4D))),
-                        onPressed: () =>
-                            Modular.to.pushReplacementNamed("/home")),
-                  ],
-                ));
+              : _showDialog());
     });
   }
 
   Widget _bodyPage() {
     return Observer(builder: (_) {
-      return controller.repoInfoList.length == 0 ? _loadingPage() : _showInfo();
+      return controller.repoInfoList.length == 0 ? _loadingPage() : _showInfo() ;
     });
   }
 }
