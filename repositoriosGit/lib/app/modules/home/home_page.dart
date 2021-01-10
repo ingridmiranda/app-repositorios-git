@@ -26,6 +26,8 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
   bool isConnected;
   bool isTimeout;
   int times = 0;
+  Duration timeout = const Duration(seconds: 3);
+  Duration ms = const Duration(milliseconds: 1);
 
   void _testConnection() async {
     try {
@@ -51,7 +53,9 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
     super.initState();
   }
 
-  
+  void dispose(){
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +77,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
         ],
       ),
     ),
-          child: Scaffold(
+      child: Scaffold(
         backgroundColor: Color(0xFF3D5A80),
         body: Observer(builder: (_) {
           return Column(
@@ -184,9 +188,6 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
       padding: EdgeInsets.only(bottom: 30),
     );
   }
-
-  Duration timeout = const Duration(seconds: 3);
-  Duration ms = const Duration(milliseconds: 1);
 
   startTimeout([int milliseconds]) {
     var duration = milliseconds == null ? timeout : ms * milliseconds;
