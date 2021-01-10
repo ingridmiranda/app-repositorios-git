@@ -55,17 +55,36 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFF3D5A80),
-      body: Observer(builder: (_) {
-        return Column(
-          children: <Widget>[
-            (controller.repoInfoList.length == 0 || isConnected == false) ? SizedBox() : _titleText(),
-            _bodyPage(),
-            _bottomPage()
-          ],
-        );
-      }),
+    return WillPopScope(
+      onWillPop: () => showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text('Atenção'),
+        content: Text('Você realmente deseja sair?'),
+        actions: [
+          FlatButton(
+            child: Text('Sim'),
+            onPressed: () => Navigator.pop(c, true),
+          ),
+          FlatButton(
+            child: Text('Não'),
+            onPressed: () => Navigator.pop(c, false),
+          ),
+        ],
+      ),
+    ),
+          child: Scaffold(
+        backgroundColor: Color(0xFF3D5A80),
+        body: Observer(builder: (_) {
+          return Column(
+            children: <Widget>[
+              (controller.repoInfoList.length == 0 || isConnected == false) ? SizedBox() : _titleText(),
+              _bodyPage(),
+              _bottomPage()
+            ],
+          );
+        }),
+      ),
     );
   }
 
